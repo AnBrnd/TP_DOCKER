@@ -6,15 +6,15 @@ services:
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: database_tp_docker
-      MYSQL_USER: user_tp_docker
-      MYSQL_PASSWORD: password_tp_docker
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - ./data:/var/lib/mysql
 
   bff:
-    image: tp_docker_bff
+    image: tp_docker_ab_bff_v3
     depends_on:
       - mariadb
     ports:
@@ -22,10 +22,11 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
     volumes:
-      - ./bff/application-docker.properties:/usr/src/app/application-docker.properties
+      - ./bff/target/application-docker.properties:/usr/src/app/application-docker.properties
+
 
   front:
-    image: tp_docker_front
+    image: tp_docker_ab_front_v2
     ports:
       - "80:80"
     depends_on:
@@ -37,7 +38,8 @@ services:
       - mariadb
     environment:
       PMA_HOST: mariadb
-      PMA_USER: user_tp_docker
-      PMA_PASSWORD: password_tp_docker
+      PMA_USER: ${MYSQL_USER}
+      PMA_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "8081:80"
+
